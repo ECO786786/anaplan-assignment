@@ -1,0 +1,30 @@
+version: "3.5"
+
+services:
+  mysql-db:
+    platform: linux/x86_64
+    image: mysql:5
+    ports:
+      - 3307:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: test123
+      MYSQL_DATABASE: definitions
+    volumes:
+      - ./database:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -ptest123 -e 'select 1'"]
+      interval: 5s
+      retries: 50
+
+  app:
+    build: ./app
+    ports:
+      - 3000:3000
+
+  api:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
+      - 443:443
